@@ -1,14 +1,19 @@
 {
   "dependencies": {
+    "@radix-ui/react-scroll-area": "^1.2.0",
     "lodash.throttle": "^4.1.1",
+    "lucide-react": "^0.456.0",
     "perfect-cursors": "^1.0.5",
     "react": "^18.2.0",
     "react-avatar": "^5.0.3",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "react-simple-wysiwyg": "^2.1.4",
-    "react-use-websocket": "^4.2.0",
-    "reactstrap": "^9.1.5"
+    "react-use-websocket": "^4.10.1",
+    "reactstrap": "^9.1.5",
+    "shadcn-ui": "^0.9.3",
+    "uuid": "^11.0.3",
+    "ws": "^8.18.0"
   },
   "scripts": {
     "start": "react-scripts start",

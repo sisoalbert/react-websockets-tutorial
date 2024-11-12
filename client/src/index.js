@@ -1,15 +1,18 @@
-import React, { useState } from 'react'
-import ReactDOM from 'react-dom/client'
-import { Home } from './components/Home'
-import { Login } from './components/Login'
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
+import { Home } from "./components/Home";
+import { Login } from "./components/Login";
+import ChatApp from "./components/Chat";
 
 const App = () => {
-  const [username, setUsername] = useState('')
+  const [username, setUsername] = useState("");
 
-  return username
-    ? <Home username={username} />
-    : <Login onSubmit={setUsername} />
-}
+  return username ? (
+    <ChatApp username={username} />
+  ) : (
+    <Login onSubmit={setUsername} />
+  );
+};
 
-const root = ReactDOM.createRoot(document.getElementById('root'))
-root.render(<App />)
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
