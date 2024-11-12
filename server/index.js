@@ -2,6 +2,8 @@ const { WebSocketServer } = require("ws");
 const http = require("http");
 const uuidv4 = require("uuid").v4;
 const url = require("url");
+const { MongoClient } = require("mongodb");
+require("dotenv").config();
 
 const server = http.createServer();
 const wsServer = new WebSocketServer({ server });
@@ -9,13 +11,38 @@ const wsServer = new WebSocketServer({ server });
 const port = 8000;
 const connections = {};
 const users = {};
-const chatHistory = []; // Store chat history
-const MAX_HISTORY = 100; // Maximum number of messages to keep
+const chatHistory = []; // Local chat history in memory for quick access
+const MAX_HISTORY = 100; // Maximum number of messages to keep in memory
+
+// MongoDB connection setup
+const mongoUri = process.env.MONGODB_URI_QUESTER;
+const dbName = "testchat";
+const collectionName = "messages";
+let messageCollection;
+
+MongoClient.connect(mongoUri)
+  .then((client) => {
+    console.log("Connected to MongoDB");
+    const db = client.db(dbName);
+    messageCollection = db.collection(collectionName);
+
+    // Load initial chat history from MongoDB on server startup
+    return messageCollection
+      .find()
+      .sort({ timestamp: 1 })
+      .limit(MAX_HISTORY)
+      .toArray();
+  })
+  .then((initialHistory) => {
+    chatHistory.push(...initialHistory); // Load initial history into memory
+  })
+  .catch((error) => {
+    console.error("MongoDB connection error:", error);
+  });
 
 // Helper function to send JSON message to a specific connection
 const sendJsonMessage = (connection, message) => {
   if (connection.readyState === 1) {
-    // Check if connection is open
     connection.send(JSON.stringify(message));
   }
 };
@@ -37,7 +64,7 @@ const broadcastUsers = () => {
 };
 
 // Handle different types of messages
-const handleMessage = (messageData, uuid) => {
+const handleMessage = async (messageData, uuid) => {
   const user = users[uuid];
   if (!user) return;
 
@@ -54,10 +81,17 @@ const handleMessage = (messageData, uuid) => {
           timestamp: new Date().toISOString(),
         };
 
-        // Store in chat history
+        // Store in local chat history
         chatHistory.push(chatMessage);
         if (chatHistory.length > MAX_HISTORY) {
           chatHistory.shift(); // Remove oldest message if exceeded max
+        }
+
+        // Store in MongoDB
+        if (messageCollection) {
+          await messageCollection.insertOne(chatMessage);
+        } else {
+          console.warn("Message collection is not initialized");
         }
 
         // Broadcast to all clients

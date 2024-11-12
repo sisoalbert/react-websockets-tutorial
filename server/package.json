@@ -1,9 +1,12 @@
 {
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "react-scripts build"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "mongodb": "^6.10.0",
     "uuid": "^9.0.0",
     "ws": "^8.11.0"
   }
